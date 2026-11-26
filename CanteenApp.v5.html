@@ -1,0 +1,1149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>School Canteen App</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #0b3d11; /* Dark Forest Green */
+            --bg-color: #f0fff4; /* Light Mint Green */
+            --card-bg: #ffffff;
+            --text-muted: #557a58; /* Muted Green-Grey */
+            --accent-color: #2ecc71; /* Vibrant Success Green */
+            --notify-color: #e74c3c; /* Notice Red for Cart Badge & Bin */
+            --border-color: #c8e6c9; /* Light Sage Border */
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: #8fbc8f; /* Dark Sea Green background for desktop framing */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* Smartphone Container Frame */
+        .phone-container {
+            width: 375px;
+            height: 812px;
+            background-color: var(--bg-color);
+            border: 12px solid #000000; /* Sleek Black Phone Border */
+            border-radius: 40px;
+            position: relative;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* App Screens */
+        .screen {
+            display: none;
+            flex-direction: column;
+            height: 100%;
+            width: 100%;
+            padding: 20px;
+            overflow-y: auto;
+            padding-bottom: 95px; /* Spacer for fixed bottom nav */
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        /* Brush Title Effect matched to Dark Green theme */
+        .app-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .brush-title-container {
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='70' viewBox='0 0 240 70'><path d='M10,25 C40,12 90,18 140,12 C190,6 225,14 232,28 C238,40 225,52 180,56 C130,60 70,54 30,58 C10,60 2,48 10,25 Z M20,28 C50,22 100,26 150,20 C180,16 210,22 218,30' fill='%230b3d11'/></svg>");
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            width: 240px;
+            height: 70px;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 2px;
+        }
+
+        .brush-title {
+            color: #ffffff;
+            font-size: 24px;
+            font-weight: 700;
+            font-family: "Courier New", Courier, monospace;
+            text-transform: lowercase;
+            padding-bottom: 6px;
+        }
+
+        .subtext {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 600;
+        }
+
+        /* --- HOME / SPLASH SCREEN --- */
+        #home-screen {
+            justify-content: center;
+            align-items: center;
+            background-color: #ffffff;
+        }
+
+        .logo-placeholder {
+            width: 160px;
+            height: 160px;
+            border: 3px solid var(--primary-color);
+            border-radius: 24px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: var(--primary-color);
+            background: #fafafa;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.05);
+        }
+
+        .logo-placeholder i {
+            font-size: 55px;
+            margin-bottom: 12px;
+        }
+
+        /* --- MENU SCREEN --- */
+        .menu-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 5px;
+        }
+
+        .category-card {
+            background: var(--card-bg);
+            border: 1.5px solid var(--border-color);
+            border-radius: 16px;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.04);
+            transition: transform 0.2s, border-color 0.2s;
+        }
+
+        .category-card:hover {
+            transform: scale(1.02);
+            border-color: var(--primary-color);
+        }
+
+        .category-img-container {
+            width: 100%;
+            height: 95px;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 10px;
+            background-color: #eee;
+        }
+
+        .category-img-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .category-card h4 {
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #000000;
+            letter-spacing: 0.5px;
+        }
+
+        /* --- DAILY SPECIALS SCREEN --- */
+        .special-item {
+            background: var(--card-bg);
+            border: 1.5px solid var(--border-color);
+            border-radius: 16px;
+            padding: 12px;
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+        }
+
+        .special-top {
+            display: flex;
+            gap: 14px;
+            align-items: center;
+            width: 100%;
+        }
+
+        .special-img-container {
+            width: 85px;
+            height: 85px;
+            border-radius: 12px;
+            overflow: hidden;
+            flex-shrink: 0;
+            background-color: #eee;
+            border: 1px solid var(--border-color);
+        }
+
+        .special-img-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .special-details {
+            flex-grow: 1;
+        }
+
+        .special-details h4 {
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 3px;
+            color: #000000;
+        }
+
+        .special-details p {
+            font-size: 11px;
+            color: var(--text-muted);
+            line-height: 1.4;
+            margin-bottom: 8px;
+        }
+
+        .special-action {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .price {
+            font-weight: 700;
+            font-size: 14px;
+            color: #000000;
+        }
+
+        /* Custom Order Notes Input Styles */
+        .special-notes-input {
+            width: 100%;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 6px 10px;
+            font-size: 11px;
+            margin-top: 10px;
+            outline: none;
+            background-color: #faffff;
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+
+        .special-notes-input:focus {
+            border-color: var(--primary-color);
+            background-color: #ffffff;
+        }
+
+        /* Styling for locked inputs */
+        .special-notes-input:disabled {
+            background-color: #e8f5e9;
+            border-color: #a5d6a7;
+            color: #2e7d32;
+            cursor: not-allowed;
+            font-style: italic;
+        }
+
+        /* Toggle Actions Buttons UI Elements */
+        .add-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 5px 14px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .add-btn:active {
+            opacity: 0.8;
+        }
+
+        .quantity-control-container {
+            display: none; /* Inactive default state */
+            align-items: center;
+            gap: 6px;
+        }
+
+        .status-added-badge {
+            font-size: 10px;
+            color: var(--accent-color);
+            font-weight: 700;
+            margin-right: 4px;
+        }
+
+        .qty-btn {
+            background: #e0f2f1;
+            color: var(--primary-color);
+            border: 1px solid var(--border-color);
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            font-size: 12px;
+            font-weight: 700;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .qty-btn:active {
+            background: var(--border-color);
+        }
+
+        .qty-number {
+            font-size: 13px;
+            font-weight: 700;
+            min-width: 14px;
+            text-align: center;
+            color: #000000;
+        }
+
+        /* --- PROFILE & REWARDS SCREEN --- */
+        .profile-info {
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .avatar-circle {
+            width: 95px;
+            height: 95px;
+            border: 3px solid var(--primary-color);
+            border-radius: 50%;
+            margin: 0 auto 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            background: #fff;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+        }
+        
+        .avatar-circle img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .profile-name {
+            font-size: 19px;
+            font-weight: 700;
+            margin-bottom: 2px;
+            color: #000000;
+        }
+
+        .profile-bio {
+            background: #fff;
+            border: 1.5px solid var(--border-color);
+            border-radius: 16px;
+            padding: 14px;
+            margin-top: 15px;
+            font-size: 12px;
+            color: #000000;
+            line-height: 1.6;
+            text-align: left;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+        }
+
+        .profile-loyalty-section {
+            background: #fff;
+            border: 1.5px solid var(--border-color);
+            border-radius: 16px;
+            padding: 14px;
+            margin-top: 15px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+            text-align: left;
+        }
+
+        .rewards-bar-container {
+            width: 100%;
+            height: 14px;
+            background-color: #e0f2f1;
+            border-radius: 7px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            margin: 6px 0 4px 0;
+        }
+
+        .rewards-bar-fill {
+            height: 100%;
+            background-color: var(--primary-color);
+            border-radius: 7px;
+        }
+
+        .barcode-container {
+            text-align: center;
+            border: 1.5px solid #000000;
+            padding: 8px;
+            border-radius: 10px;
+            background-color: #fff;
+            margin-top: 8px;
+        }
+
+        /* --- CHECKOUT SCREEN --- */
+        .cart-list {
+            background: white;
+            border: 1.5px solid var(--border-color);
+            border-radius: 16px;
+            padding: 12px;
+            margin-top: 10px;
+            max-height: 260px;
+            overflow-y: auto;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px dashed var(--border-color);
+            font-size: 13px;
+            color: #000000;
+        }
+
+        .cart-item:last-child {
+            border-bottom: none;
+        }
+
+        .cart-item-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .cart-delete-icon {
+            color: var(--notify-color);
+            cursor: pointer;
+            font-size: 14px;
+            transition: transform 0.1s ease, opacity 0.1s ease;
+        }
+
+        .cart-delete-icon:hover {
+            transform: scale(1.25);
+            opacity: 0.8;
+        }
+
+        .item-notes-display {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-style: italic;
+            margin-top: 2px;
+            display: block;
+        }
+
+        .total-section {
+            text-align: center;
+            margin: 25px 0;
+        }
+
+        .total-section label {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+        }
+
+        .total-price {
+            font-size: 34px;
+            font-weight: 800;
+            margin-top: 5px;
+            color: #000000;
+        }
+
+        .pay-btn {
+            background: var(--primary-color);
+            color: white;
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 30px;
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        /* --- ORDER CONFIRMATION --- */
+        .success-icon {
+            font-size: 55px;
+            color: var(--accent-color);
+            text-align: center;
+            margin: 15px 0 10px;
+        }
+
+        .conf-msg {
+            text-align: center;
+            font-style: italic;
+            font-size: 15px;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #000000;
+        }
+
+        .order-number {
+            text-align: center;
+            font-size: 28px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            color: #000000;
+        }
+
+        /* --- ORDER HISTORY SCREEN --- */
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .history-card {
+            background: #fff;
+            border: 1px solid var(--border-color);
+            padding: 12px;
+            border-radius: 12px;
+            font-size: 13px;
+            color: #000000;
+        }
+
+        /* --- BOTTOM NAVIGATION BAR WITH POPPING ANIMATIONS --- */
+        .bottom-nav {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 80px;
+            background-color: var(--primary-color);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding-bottom: 15px; 
+            z-index: 100;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .bottom-nav.hidden {
+            transform: translateY(85px);
+        }
+
+        .nav-item {
+            color: #92bfa0; /* Light green-sage for unselected elements */
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 9px;
+            font-weight: 500;
+            cursor: pointer;
+            flex: 1;
+            /* Spring-pop animation curve effect */
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), color 0.2s ease;
+        }
+
+        /* Enlarge by 15% on Hover */
+        .nav-item:hover {
+            transform: scale(1.15);
+            color: #ffffff;
+        }
+
+        /* Enlarge and Bold Active Navigation Menu State */
+        .nav-item.active {
+            color: #ffffff;
+            transform: scale(1.1); 
+            font-weight: 700;
+        }
+
+        /* Allow active items to scale slightly further on direct user hover */
+        .nav-item.active:hover {
+            transform: scale(1.2);
+        }
+
+        .nav-icon-container {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 4px;
+        }
+
+        .nav-item i {
+            font-size: 19px;
+        }
+
+        /* Badge Notification Style */
+        .cart-badge {
+            position: absolute;
+            top: -6px;
+            right: -10px;
+            background-color: var(--notify-color);
+            color: #ffffff;
+            font-size: 9px;
+            font-weight: 700;
+            border-radius: 10px;
+            min-width: 16px;
+            height: 16px;
+            display: none; 
+            justify-content: center;
+            align-items: center;
+            padding: 0 4px;
+            border: 1.5px solid var(--primary-color);
+        }
+
+        .screen::-webkit-scrollbar {
+            width: 4px;
+        }
+        .screen::-webkit-scrollbar-thumb {
+            background: #ccc;
+            border-radius: 2px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="phone-container">
+
+        <div id="home-screen" class="screen active">
+            <div class="logo-placeholder">
+                <i class="fas fa-utensils"></i>
+                <span style="font-weight: 800; font-size: 13px; text-transform: uppercase; letter-spacing:1px; color:#000000; margin-top:5px;">Campus Bites</span>
+            </div>
+            <p style="margin-top: 15px; font-size: 11px; color: var(--text-muted); letter-spacing: 0.5px;">Loading Canteen...</p>
+        </div>
+
+        <div id="menu-screen" class="screen">
+            <div class="app-header">
+                <div class="brush-title-container"><div class="brush-title">menu</div></div>
+                <div class="subtext">Select Category</div>
+            </div>
+            <div class="menu-grid">
+                <div class="category-card" onclick="navigateTo('specials-screen', document.getElementById('nav-specials'))">
+                    <div class="category-img-container">
+                        <img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=300&auto=format&fit=crop&q=60" alt="Daily Specials">
+                    </div>
+                    <h4>Daily Specials</h4>
+                </div>
+                <div class="category-card" onclick="alert('Breakfast menu available 7:30 AM - 9:00 AM')">
+                    <div class="category-img-container">
+                        <img src="https://images.unsplash.com/photo-1525351484163-7529414344d8?w=300&auto=format&fit=crop&q=60" alt="Breakfast">
+                    </div>
+                    <h4>Breakfast</h4>
+                </div>
+                <div class="category-card" onclick="alert('Lunch menu available 11:30 AM - 1:30 PM')">
+                    <div class="category-img-container">
+                        <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=300&auto=format&fit=crop&q=60" alt="Lunch Meals">
+                    </div>
+                    <h4>Lunch Meals</h4>
+                </div>
+                <div class="category-card" onclick="alert('Cold Drinks & Snacks window open all day')">
+                    <div class="category-img-container">
+                        <img src="https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=300&auto=format&fit=crop&q=60" alt="Drinks">
+                    </div>
+                    <h4>Drinks</h4>
+                </div>
+            </div>
+        </div>
+
+        <div id="specials-screen" class="screen">
+            <div class="app-header">
+                <div class="brush-title-container"><div class="brush-title">specials</div></div>
+                <div class="subtext">Freshly Made Today</div>
+            </div>
+            
+            <div class="special-item" id="item-box-burger">
+                <div class="special-top">
+                    <div class="special-img-container">
+                        <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=200&auto=format&fit=crop&q=70" alt="Chicken Burger">
+                    </div>
+                    <div class="special-details">
+                        <h4>Chicken Burger</h4>
+                        <p>Crispy chicken breast, fresh lettuce, and burger sauce on a brioche bun.</p>
+                        <div class="special-action">
+                            <span class="price">$6.50</span>
+                            
+                            <button class="add-btn" id="add-btn-burger" onclick="initiateCartItem('Chicken Burger', 6.50, 'burger')">+ Add</button>
+                            
+                            <div class="quantity-control-container" id="qty-panel-burger">
+                                <span class="status-added-badge"><i class="fas fa-check"></i> Added</span>
+                                <div class="qty-btn" onclick="adjustItemQuantity('Chicken Burger', -1, 'burger')">-</div>
+                                <div class="qty-number" id="qty-val-burger">0</div>
+                                <div class="qty-btn" onclick="adjustItemQuantity('Chicken Burger', 1, 'burger')">+</div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <input type="text" class="special-notes-input" id="notes-burger" placeholder="Add prep notes (e.g., no lettuce, extra sauce)...">
+            </div>
+
+            <div class="special-item" id="item-box-fish">
+                <div class="special-top">
+                    <div class="special-img-container">
+                        <img src="https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?w=200&auto=format&fit=crop&q=70" alt="Fish and Chips">
+                    </div>
+                    <div class="special-details">
+                        <h4>Fish and Chips</h4>
+                        <p>Battered fish fillet served with side of golden sea-salt fries and tartare sauce.</p>
+                        <div class="special-action">
+                            <span class="price">$7.50</span>
+                            
+                            <button class="add-btn" id="add-btn-fish" onclick="initiateCartItem('Fish and Chips', 7.50, 'fish')">+ Add</button>
+                            
+                            <div class="quantity-control-container" id="qty-panel-fish">
+                                <span class="status-added-badge"><i class="fas fa-check"></i> Added</span>
+                                <div class="qty-btn" onclick="adjustItemQuantity('Fish and Chips', -1, 'fish')">-</div>
+                                <div class="qty-number" id="qty-val-fish">0</div>
+                                <div class="qty-btn" onclick="adjustItemQuantity('Fish and Chips', 1, 'fish')">+</div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <input type="text" class="special-notes-input" id="notes-fish" placeholder="Add prep notes (e.g., wrap in foil, extra lemon)...">
+            </div>
+
+            <div class="special-item" id="item-box-kebab">
+                <div class="special-top">
+                    <div class="special-img-container">
+                        <img src="https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=200&auto=format&fit=crop&q=70" alt="Mixed Kebab">
+                    </div>
+                    <div class="special-details">
+                        <h4>Mixed Kebab</h4>
+                        <p>Seasoned lamb and chicken pieces wrapped in warm flatbread with signature sauce.</p>
+                        <div class="special-action">
+                            <span class="price">$8.00</span>
+                            
+                            <button class="add-btn" id="add-btn-kebab" onclick="initiateCartItem('Mixed Kebab', 8.00, 'kebab')">+ Add</button>
+                            
+                            <div class="quantity-control-container" id="qty-panel-kebab">
+                                <span class="status-added-badge"><i class="fas fa-check"></i> Added</span>
+                                <div class="qty-btn" onclick="adjustItemQuantity('Mixed Kebab', -1, 'kebab')">-</div>
+                                <div class="qty-number" id="qty-val-kebab">0</div>
+                                <div class="qty-btn" onclick="adjustItemQuantity('Mixed Kebab', 1, 'kebab')">+</div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <input type="text" class="special-notes-input" id="notes-kebab" placeholder="Add prep notes (e.g., no onions, garlic sauce)...">
+            </div>
+        </div>
+
+        <div id="profile-screen" class="screen">
+            <div class="app-header">
+                <div class="brush-title-container"><div class="brush-title">profile</div></div>
+                <div class="subtext">Student Card</div>
+            </div>
+            <div class="profile-info">
+                <div class="avatar-circle">
+                    <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80" alt="Student Profile">
+                </div>
+                <div class="profile-name">Alex Mercer</div>
+                <div class="subtext" style="color: var(--primary-color); font-weight: bold; font-size:10px;">Grade 11 • Active Member</div>
+                
+                <div class="profile-bio">
+                    <strong>Student ID:</strong> #2026-98432<br>
+                    <strong>Canteen Balance:</strong> $24.50<br>
+                    <strong>Dietary Restrictions:</strong> None Registered.<br>
+                </div>
+                
+                <div class="profile-loyalty-section">
+                    <p style="font-size:12px; font-weight:bold; color:var(--primary-color);">Canteen Rewards Points</p>
+                    <div class="rewards-bar-container">
+                        <div class="rewards-bar-fill" style="width: 25%;"></div>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; font-size:10px; color:var(--text-muted); font-weight:600; margin-bottom:12px;">
+                        <span>250 Points</span>
+                        <span>Goal: 1000 Points</span>
+                    </div>
+
+                    <p style="font-size:10px; text-transform:uppercase; color:var(--text-muted); text-align:center; letter-spacing:1px; font-weight:700; margin-bottom:4px;">Scan Card At Register</p>
+                    <div class="barcode-container">
+                        <svg viewBox="0 0 100 30" style="width: 80%; height: 45px; display: block; margin: 0 auto;">
+                            <rect x="0" y="0" width="100" height="30" fill="#ffffff"/>
+                            <rect x="4" y="2" width="2" height="26" fill="#000000"/>
+                            <rect x="8" y="2" width="1" height="26" fill="#000000"/>
+                            <rect x="11" y="2" width="3" height="26" fill="#000000"/>
+                            <rect x="16" y="2" width="1" height="26" fill="#000000"/>
+                            <rect x="19" y="2" width="2" height="26" fill="#000000"/>
+                            <rect x="23" y="2" width="4" height="26" fill="#000000"/>
+                            <rect x="29" y="2" width="1" height="26" fill="#000000"/>
+                            <rect x="32" y="2" width="2" height="26" fill="#000000"/>
+                            <rect x="36" y="2" width="3" height="26" fill="#000000"/>
+                            <rect x="41" y="2" width="1" height="26" fill="#000000"/>
+                            <rect x="44" y="2" width="2" height="26" fill="#000000"/>
+                            <rect x="48" y="2" width="4" height="26" fill="#000000"/>
+                            <rect x="54" y="2" width="1" height="26" fill="#000000"/>
+                            <rect x="57" y="2" width="2" height="26" fill="#000000"/>
+                            <rect x="61" y="2" width="3" height="26" fill="#000000"/>
+                            <rect x="66" y="2" width="1" height="26" fill="#000000"/>
+                            <rect x="69" y="2" width="4" height="26" fill="#000000"/>
+                            <rect x="75" y="2" width="2" height="26" fill="#000000"/>
+                            <rect x="79" y="2" width="1" height="26" fill="#000000"/>
+                            <rect x="82" y="2" width="3" height="26" fill="#000000"/>
+                            <rect x="87" y="2" width="1" height="26" fill="#000000"/>
+                            <rect x="90" y="2" width="2" height="26" fill="#000000"/>
+                            <rect x="94" y="2" width="2" height="26" fill="#000000"/>
+                        </svg>
+                        <p style="font-size:9px; color:#000000; font-family:'Courier New', monospace; font-weight:bold; margin-top:4px; letter-spacing: 1px;">*98432-ALEX*</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="history-screen" class="screen">
+            <div class="app-header">
+                <div class="brush-title-container"><div class="brush-title">history</div></div>
+                <div class="subtext">Past Orders</div>
+            </div>
+            <div class="history-list" id="history-list-container">
+                <div class="history-card">
+                    <div style="display:flex; justify-content:space-between; font-weight:bold; margin-bottom:5px;">
+                        <span>Order #3021</span>
+                        <span>$6.50</span>
+                    </div>
+                    <div style="font-size:11px; color:var(--text-muted)">Yesterday • 1x Chicken Burger</div>
+                </div>
+                <div class="history-card">
+                    <div style="display:flex; justify-content:space-between; font-weight:bold; margin-bottom:5px;">
+                        <span>Order #2984</span>
+                        <span>$3.50</span>
+                    </div>
+                    <div style="font-size:11px; color:var(--text-muted)">14 May 2026 • 2x Fruit Juices</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="checkout-screen" class="screen">
+            <div class="app-header">
+                <div class="brush-title-container"><div class="brush-title">checkout</div></div>
+                <div class="subtext">Review Basket</div>
+            </div>
+            
+            <div class="cart-list" id="cart-items-container">
+                <p style="text-align:center; color:var(--text-muted); padding: 20px 0; font-size:13px;">Your cart is empty.</p>
+            </div>
+
+            <div class="total-section">
+                <label>Total Cost</label>
+                <div class="total-price" id="cart-total">$0.00</div>
+            </div>
+
+            <button class="pay-btn" onclick="processPayment()">Pay Now</button>
+        </div>
+
+        <div id="confirmation-screen" class="screen">
+            <div class="app-header">
+                <div class="brush-title-container"><div class="brush-title">receipt</div></div>
+                <div class="subtext">Success</div>
+            </div>
+            <div class="success-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="conf-msg">Order Confirmed!</div>
+            <div class="order-number" id="receipt-order-id">#0000</div>
+
+            <div class="cart-list" id="receipt-items-container" style="max-height:180px; margin-bottom:15px;">
+                </div>
+            
+            <p style="font-size:11px; color:var(--text-muted); text-align:center; line-height:1.4;">
+                Please collect your order at the pickup line during lunch break. Show this generated code screen.
+            </p>
+        </div>
+
+        <nav class="bottom-nav hidden" id="main-nav">
+            <div class="nav-item" onclick="navigateTo('profile-screen', this)">
+                <div class="nav-icon-container"><i class="fas fa-user"></i></div>
+                Profile
+            </div>
+            <div class="nav-item" onclick="navigateTo('history-screen', this)">
+                <div class="nav-icon-container"><i class="fas fa-history"></i></div>
+                History
+            </div>
+            <div class="nav-item active" id="nav-menu" onclick="navigateTo('menu-screen', this)">
+                <div class="nav-icon-container"><i class="fas fa-utensils"></i></div>
+                Menu / Order
+            </div>
+            <div class="nav-item" id="nav-specials" onclick="navigateTo('specials-screen', this)">
+                <div class="nav-icon-container"><i class="fas fa-star"></i></div>
+                Specials
+            </div>
+            <div class="nav-item" onclick="navigateTo('checkout-screen', this)">
+                <div class="nav-icon-container">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-badge" id="nav-cart-badge">0</span>
+                </div>
+                Cart
+            </div>
+        </nav>
+
+    </div>
+
+    <script>
+        // Global State Engines
+        let cart = [];
+        let orderHistory = [];
+
+        // 3-Second Splash Transition Delay 
+        window.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                document.getElementById('home-screen').classList.remove('active');
+                document.getElementById('menu-screen').classList.add('active');
+                document.getElementById('main-nav').classList.remove('hidden');
+            }, 3000);
+        });
+
+        // App Routing Handler
+        function navigateTo(screenId, element) {
+            const screens = document.querySelectorAll('.screen');
+            screens.forEach(screen => screen.classList.remove('active'));
+
+            document.getElementById(screenId).classList.add('active');
+
+            if (element) {
+                const navItems = document.querySelectorAll('.nav-item');
+                navItems.forEach(item => item.classList.remove('active'));
+                element.classList.add('active');
+            }
+
+            if (screenId === 'checkout-screen') {
+                renderCart();
+            }
+        }
+
+        // Trigger First-time Item Addition
+        function initiateCartItem(itemName, itemPrice, codeKey) {
+            const notesInput = document.getElementById(`notes-${codeKey}`);
+            const noteText = notesInput ? notesInput.value.trim() : "";
+
+            // Push to state array engine
+            cart.push({
+                name: itemName,
+                price: itemPrice,
+                quantity: 1,
+                notes: noteText,
+                key: codeKey
+            });
+
+            // Adjust interface styling views
+            document.getElementById(`add-btn-${codeKey}`).style.display = 'none';
+            document.getElementById(`qty-panel-${codeKey}`).style.display = 'flex';
+            document.getElementById(`qty-val-${codeKey}`).innerText = '1';
+
+            // DISABLE the textbox once item is added
+            if (notesInput) {
+                notesInput.disabled = true;
+            }
+
+            updateCartBadge();
+        }
+
+        // Adjust Existing Quantities Up/Down (+ / - panel system)
+        function adjustItemQuantity(itemName, amount, codeKey) {
+            const itemInstance = cart.find(item => item.name === itemName);
+            
+            if (itemInstance) {
+                itemInstance.quantity += amount;
+                
+                if (itemInstance.quantity <= 0) {
+                    // Remove from array ledger completely
+                    cart = cart.filter(item => item.name !== itemName);
+                    
+                    // Reset inputs & buttons UI fields back to original layout
+                    document.getElementById(`qty-panel-${codeKey}`).style.display = 'none';
+                    document.getElementById(`add-btn-${codeKey}`).style.display = 'block';
+                    
+                    // UNLOCK and RESET text box
+                    const notesInput = document.getElementById(`notes-${codeKey}`);
+                    if (notesInput) {
+                        notesInput.disabled = false;
+                        notesInput.value = ""; 
+                    }
+                } else {
+                    document.getElementById(`qty-val-${codeKey}`).innerText = itemInstance.quantity;
+                }
+            }
+            updateCartBadge();
+        }
+
+        // Drop Item Completely From Cart via Trash Bin Icon on Checkout Screen
+        function removeFromCart(itemName, codeKey) {
+            cart = cart.filter(item => item.name !== itemName);
+            
+            // Sync UI panel views back and unlock text area if it belongs to specials menu
+            if (codeKey && document.getElementById(`qty-panel-${codeKey}`)) {
+                document.getElementById(`qty-panel-${codeKey}`).style.display = 'none';
+                document.getElementById(`add-btn-${codeKey}`).style.display = 'block';
+                
+                const notesInput = document.getElementById(`notes-${codeKey}`);
+                if (notesInput) {
+                    notesInput.disabled = false;
+                    notesInput.value = "";
+                }
+            }
+            
+            updateCartBadge();
+            renderCart();
+        }
+
+        // Live Dynamic Notification Badge Update
+        function updateCartBadge() {
+            const badge = document.getElementById('nav-cart-badge');
+            const totalItems = cart.reduce((total, item) => total + item.quantity, 0);
+            
+            if (totalItems > 0) {
+                badge.innerText = totalItems;
+                badge.style.display = 'flex';
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+
+        // Generate Checkout List Layout with Attached Instructions Display
+        function renderCart() {
+            const container = document.getElementById('cart-items-container');
+            const totalDisplay = document.getElementById('cart-total');
+            
+            if (cart.length === 0) {
+                container.innerHTML = `<p style="text-align:center; color:var(--text-muted); padding: 20px 0; font-size:13px;">Your cart is empty.</p>`;
+                totalDisplay.innerText = "$0.00";
+                return;
+            }
+
+            let htmlStr = '';
+            let totalCost = 0;
+
+            cart.forEach(item => {
+                const linePrice = item.price * item.quantity;
+                totalCost += linePrice;
+                
+                // Show custom notes element if user entered them
+                const notesDisplayHtml = item.notes ? `<span class="item-notes-display">Note: "${item.notes}"</span>` : '';
+
+                htmlStr += `
+                    <div class="cart-item">
+                        <div>
+                            <div><strong>✓ ${item.name}</strong> <span style="color:var(--text-muted)">x${item.quantity}</span></div>
+                            ${notesDisplayHtml}
+                        </div>
+                        <div class="cart-item-right">
+                            <div>$${linePrice.toFixed(2)}</div>
+                            <i class="fas fa-trash-alt cart-delete-icon" onclick="removeFromCart('${item.name}', '${item.key}')" title="Remove item"></i>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = htmlStr;
+            totalDisplay.innerText = `$${totalCost.toFixed(2)}`;
+        }
+
+        // Process Mock Payment Action
+        function processPayment() {
+            if (cart.length === 0) {
+                alert("Add items to your cart before checking out!");
+                return;
+            }
+
+            const randomOrderId = Math.floor(1000 + Math.random() * 9000);
+            document.getElementById('receipt-order-id').innerText = `#${randomOrderId}`;
+
+            const receiptContainer = document.getElementById('receipt-items-container');
+            let receiptHtml = '';
+            let receiptTotal = 0;
+
+            cart.forEach(item => {
+                const linePrice = item.price * item.quantity;
+                receiptTotal += linePrice;
+                const notesDisplayHtml = item.notes ? `<span class="item-notes-display">Note: "${item.notes}"</span>` : '';
+                
+                receiptHtml += `
+                    <div class="cart-item">
+                        <div>
+                            <div>✓ ${item.name} x${item.quantity}</div>
+                            ${notesDisplayHtml}
+                        </div>
+                        <div>$${linePrice.toFixed(2)}</div>
+                    </div>
+                `;
+            });
+            receiptContainer.innerHTML = receiptHtml;
+
+            // Log Transaction History
+            const itemsSummary = cart.map(i => {
+                return i.notes ? `${i.quantity}x ${i.name} (${i.notes})` : `${i.quantity}x ${i.name}`;
+            }).join(', ');
+
+            orderHistory.unshift({
+                id: randomOrderId,
+                total: receiptTotal.toFixed(2),
+                summary: itemsSummary
+            });
+
+            updateHistoryUI();
+
+            // Reset dynamic panels visually back across interface menus and UNLOCK text inputs
+            cart.forEach(item => {
+                if (item.key) {
+                    document.getElementById(`qty-panel-${item.key}`).style.display = 'none';
+                    document.getElementById(`add-btn-${item.key}`).style.display = 'block';
+                    const notesInput = document.getElementById(`notes-${item.key}`);
+                    if (notesInput) {
+                        notesInput.disabled = false;
+                        notesInput.value = "";
+                    }
+                }
+            });
+
+            // Reset Array Cache Engine States
+            cart = [];
+            updateCartBadge();
+            navigateTo('confirmation-screen');
+        }
+
+        // History Ledger Re-renderer
+        function updateHistoryUI() {
+            const container = document.getElementById('history-list-container');
+            let historyHtml = '';
+            
+            orderHistory.forEach(order => {
+                historyHtml += `
+                    <div class="history-card">
+                        <div style="display:flex; justify-content:space-between; font-weight:bold; margin-bottom:5px;">
+                            <span>Order #${order.id}</span>
+                            <span>$${order.total}</span>
+                        </div>
+                        <div style="font-size:11px; color:var(--text-muted)">Just Now • ${order.summary}</div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = historyHtml + `
+                <div class="history-card">
+                    <div style="display:flex; justify-content:space-between; font-weight:bold; margin-bottom:5px;">
+                        <span>Order #3021</span>
+                        <span>$6.50</span>
+                    </div>
+                    <div style="font-size:11px; color:var(--text-muted)">Yesterday • 1x Chicken Burger</div>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>
